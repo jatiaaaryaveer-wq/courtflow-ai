@@ -1,0 +1,119 @@
+// Version: 1.0.0
+type CategoryId__14729845 = Text;
+type CategoryStatus__816997691 = {#delayed; #onTrack; #urgent};
+type Category__98607404 =
+  {
+    var avgDurationMinutes : Nat;
+    var currentRound : Nat;
+    id : CategoryId__14729845;
+    var matchesCompleted : Nat;
+    var matchesPending : Nat;
+    name : Text;
+    var numPlayers : Nat;
+    var status : CategoryStatus__816997691
+  };
+type ConflictType__822133424 =
+  {
+    #backToBack;
+    #categoryClash;
+    #notReady;
+    #playerOnCourt;
+    #restNeeded;
+    #timeRisk
+  };
+type CourtId__334817733 = Nat;
+type Court__88231931 =
+  {
+    var currentMatchId : ?MatchId__543136929;
+    id : CourtId__334817733;
+    var isAvailable : Bool;
+    name : Text
+  };
+type MatchId__543136929 = Nat;
+type MatchStatus__1011309259 =
+  {#bye; #completed; #delayed; #notReady; #onCourt; #ready};
+type Match__365386565 =
+  {
+    categoryId : CategoryId__14729845;
+    categoryName : Text;
+    var conflicts : [ConflictType__822133424];
+    var courtId : ?CourtId__334817733;
+    var courtName : ?Text;
+    dependsOnMatchIds : [MatchId__543136929];
+    var endTime : ?Text;
+    estimatedDurationMinutes : Nat;
+    id : MatchId__543136929;
+    var player1Id : ?PlayerId__52807076;
+    player1Name : Text;
+    var player2Id : ?PlayerId__52807076;
+    player2Name : Text;
+    var priorityScore : Nat;
+    round : Nat;
+    roundName : Text;
+    var scoreReason : Text;
+    var startTime : ?Text;
+    var status : MatchStatus__1011309259;
+    var winnerId : ?PlayerId__52807076;
+    var winnerName : ?Text
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type PlayerId__52807076 = Text;
+type PlayerStatus__642437028 = {#completed; #playing; #resting; #waiting};
+type Player__814555281 =
+  {
+    var categories : [CategoryId__14729845];
+    var currentMatchId : ?MatchId__543136929;
+    id : PlayerId__52807076;
+    var lastMatchEndTime : ?Text;
+    var matchesPlayedToday : Nat;
+    name : Text;
+    var restRequiredUntil : ?Text;
+    var seedNumber : ?Nat;
+    var status : PlayerStatus__642437028;
+    var totalWaitingMinutes : Nat
+  };
+type TournamentStatus__62935982 =
+  {#completed; #inProgress; #panicMode; #setup};
+actor {
+  stable categories :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Category__98607404]];
+      var elementIndex : Nat__490723111
+    };
+  stable config :
+    {
+      var avgMatchDurationMinutes : Nat;
+      var courts : [Text];
+      var date : Text;
+      var endTime : Text;
+      var matchFormat : Text;
+      var minRestMinutes : Nat;
+      var name : Text;
+      var panicModeActive : Bool;
+      var panicSuggestions : [Text];
+      var startTime : Text;
+      var status : TournamentStatus__62935982;
+      var venue : Text
+    };
+  stable courts :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Court__88231931]];
+      var elementIndex : Nat__490723111
+    };
+  stable matches :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Match__365386565]];
+      var elementIndex : Nat__490723111
+    };
+  stable players :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?Player__814555281]];
+      var elementIndex : Nat__490723111
+    };
+  stable state : {var nextMatchId : Nat}
+};

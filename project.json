@@ -1,0 +1,20 @@
+{
+  "overview": "CourtFlow AI is a live tennis tournament scheduling dashboard for tournament organisers, featuring AI match recommendations, draw uploads, order of play suggestions, and conflict detection.",
+  "features": [
+    "Live court dashboard with AI match recommendations",
+    "Draw upload via CSV with validation and error reporting",
+    "Order of play suggestion ranked by player count and court efficiency",
+    "Conflict detection with player clash warnings",
+    "WhatsApp export for court assignments",
+    "Panic Mode for emergency scheduling adjustments"
+  ],
+  "category": "productivity",
+  "tags": [
+    "tennis",
+    "tournament",
+    "scheduling",
+    "sports",
+    "dashboard"
+  ],
+  "last_updated": "2026-05-29T15:47:39.145Z"
+}

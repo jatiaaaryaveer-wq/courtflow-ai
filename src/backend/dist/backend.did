@@ -1,0 +1,286 @@
+type WaitingWarningType = 
+ variant {
+   backToBackRisk;
+   multiCategoryRisk;
+   waitedTooLong;
+ };
+type WaitingWarning = 
+ record {
+   message: text;
+   playerId: PlayerId;
+   playerName: text;
+   warningType: WaitingWarningType;
+ };
+type WaitingTimeSummary = 
+ record {
+   averageWaitMinutes: nat;
+   longestWaiting: vec WaitingEntry;
+   recentlyPlayed: vec RestedEntry;
+   warnings: vec WaitingWarning;
+ };
+type WaitingEntry = 
+ record {
+   playerId: PlayerId;
+   playerName: text;
+   waitingMinutes: nat;
+ };
+type UpdateTournamentConfigArgs = 
+ record {
+   avgMatchDurationMinutes: nat;
+   courtNames: vec text;
+   date: text;
+   endTime: text;
+   matchFormat: text;
+   minRestMinutes: nat;
+   name: text;
+   startTime: text;
+   venue: text;
+ };
+type TournamentStatus = 
+ variant {
+   completed;
+   inProgress;
+   panicMode;
+   setup;
+ };
+type TournamentStats = 
+ record {
+   courtTimeRemainingMinutes: nat;
+   courtUtilisationPct: nat;
+   currentTime: text;
+   estimatedFinishTime: text;
+   isRunningLate: bool;
+   matchesCompleted: nat;
+   matchesPending: nat;
+   suggestions: vec text;
+   tournamentEndTime: text;
+ };
+type TournamentConfigView = 
+ record {
+   avgMatchDurationMinutes: nat;
+   courts: vec text;
+   date: text;
+   endTime: text;
+   matchFormat: text;
+   minRestMinutes: nat;
+   name: text;
+   panicModeActive: bool;
+   panicSuggestions: vec text;
+   startTime: text;
+   status: TournamentStatus;
+   venue: text;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: CourtFlowCourtView;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok: MatchView;
+ };
+type RestedEntry = 
+ record {
+   lastMatchEndTime: text;
+   playerId: PlayerId;
+   playerName: text;
+   restMinutesRemaining: nat;
+ };
+type QueueEntry = 
+ record {
+   match: MatchView;
+   rank: nat;
+ };
+type PlayerView = 
+ record {
+   categories: vec CategoryId;
+   currentMatchId: opt MatchId;
+   id: PlayerId;
+   lastMatchEndTime: opt text;
+   matchesPlayedToday: nat;
+   name: text;
+   restRequiredUntil: opt text;
+   seedNumber: opt nat;
+   status: PlayerStatus;
+   totalWaitingMinutes: nat;
+ };
+type PlayerStatus = 
+ variant {
+   completed;
+   playing;
+   resting;
+   waiting;
+ };
+type PlayerId = text;
+type OrderOfPlayEntry = 
+ record {
+   avgMatchDuration: nat;
+   categoryId: CategoryId;
+   categoryName: text;
+   crossCategoryClashCount: nat;
+   cumulativeMinutesIfThisOrder: nat;
+   estimatedTotalMinutes: nat;
+   playerCount: nat;
+   rank: nat;
+   reason: text;
+   totalMatches: nat;
+ };
+type MatchView = 
+ record {
+   categoryId: CategoryId;
+   categoryName: text;
+   conflicts: vec ConflictType;
+   courtId: opt CourtId;
+   courtName: opt text;
+   dependsOnMatchIds: vec MatchId;
+   endTime: opt text;
+   estimatedDurationMinutes: nat;
+   id: MatchId;
+   player1Id: opt PlayerId;
+   player1Name: text;
+   player2Id: opt PlayerId;
+   player2Name: text;
+   priorityScore: nat;
+   round: nat;
+   roundName: text;
+   scoreReason: text;
+   startTime: opt text;
+   status: MatchStatus;
+   winnerId: opt PlayerId;
+   winnerName: opt text;
+ };
+type MatchStatus = 
+ variant {
+   bye;
+   completed;
+   delayed;
+   notReady;
+   onCourt;
+   ready;
+ };
+type MatchId = nat;
+type ImportResult = 
+ record {
+   errors: vec ImportError;
+   skippedCount: nat;
+   successCount: nat;
+ };
+type ImportError = 
+ record {
+   reason: text;
+   rowIndex: nat;
+ };
+type DrawRow = 
+ record {
+   categoryId: CategoryId;
+   estimatedMinutes: nat;
+   player1Name: text;
+   player2Name: text;
+   round: text;
+ };
+type CourtId = nat;
+type CourtFlowStats = 
+ record {
+   courtTimeRemainingMinutes: nat;
+   courtUtilisationPct: nat;
+   currentTime: text;
+   estimatedFinishTime: text;
+   isRunningLate: bool;
+   matchesCompleted: nat;
+   matchesPending: nat;
+   suggestions: vec text;
+   tournamentEndTime: text;
+ };
+type CourtFlowData = 
+ record {
+   config: CourtFlowConfigView;
+   courts: vec CourtFlowCourtView;
+   matchQueue: vec QueueEntry;
+   stats: CourtFlowStats;
+ };
+type CourtFlowCourtView = 
+ record {
+   courtId: CourtId;
+   courtName: text;
+   currentMatch: opt MatchView;
+   isAvailable: bool;
+   recommendedNext: opt QueueEntry;
+ };
+type CourtFlowConfigView = 
+ record {
+   avgMatchDurationMinutes: nat;
+   courts: vec text;
+   date: text;
+   endTime: text;
+   matchFormat: text;
+   minRestMinutes: nat;
+   name: text;
+   panicModeActive: bool;
+   panicSuggestions: vec text;
+   startTime: text;
+   status: variant {
+             completed;
+             inProgress;
+             panicMode;
+             setup;
+           };
+   venue: text;
+ };
+type ConflictType = 
+ variant {
+   backToBack;
+   categoryClash;
+   notReady;
+   playerOnCourt;
+   restNeeded;
+   timeRisk;
+ };
+type CategoryView = 
+ record {
+   avgDurationMinutes: nat;
+   currentRound: nat;
+   id: CategoryId;
+   matchesCompleted: nat;
+   matchesPending: nat;
+   name: text;
+   numPlayers: nat;
+   status: CategoryStatus;
+ };
+type CategoryStatus = 
+ variant {
+   delayed;
+   onTrack;
+   urgent;
+ };
+type CategoryId = text;
+service : {
+  activatePanicMode: () -> (TournamentConfigView);
+  addPlayer: (name: text, categories: vec CategoryId, seedNumber: opt nat) ->
+   (PlayerView);
+  assignMatchToCourt: (matchId: MatchId, courtId: CourtId) -> (Result);
+  completeMatch: (matchId: MatchId, winnerId: PlayerId) -> (Result);
+  deactivatePanicMode: () -> (TournamentConfigView);
+  delayMatch: (matchId: MatchId) -> (Result);
+  freeCourtManually: (courtId: CourtId) -> (Result_1);
+  getCourtFlowData: () -> (CourtFlowData) query;
+  getMatch: (matchId: MatchId) -> (opt MatchView) query;
+  getMatchQueue: () -> (vec QueueEntry) query;
+  getOrderOfPlaySuggestion: () -> (vec OrderOfPlayEntry) query;
+  getPlayer: (playerId: PlayerId) -> (opt PlayerView) query;
+  getTournamentConfig: () -> (TournamentConfigView) query;
+  getTournamentStats: () -> (TournamentStats) query;
+  getWaitingTimeSummary: () -> (WaitingTimeSummary) query;
+  importDraw: (rows: vec DrawRow) -> (ImportResult);
+  listCategories: () -> (vec CategoryView) query;
+  listMatches: () -> (vec MatchView) query;
+  listPlayers: () -> (vec PlayerView) query;
+  overrideMatch: (matchId: MatchId, courtId: CourtId) -> (Result);
+  removePlayer: (playerId: PlayerId) -> (bool);
+  resetMatch: (matchId: MatchId) -> (Result);
+  startMatch: (matchId: MatchId, courtId: CourtId) -> (Result);
+  updatePlayer: (playerId: PlayerId, name: text, categories: vec CategoryId,
+   seedNumber: opt nat) -> (opt PlayerView);
+  updateTournamentConfig: (args: UpdateTournamentConfigArgs) ->
+   (TournamentConfigView);
+}
